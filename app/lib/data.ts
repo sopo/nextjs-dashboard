@@ -1,4 +1,5 @@
 import { sql } from '@vercel/postgres';
+
 import {
   CustomerField,
   CustomersTableType,
@@ -25,6 +26,24 @@ export async function fetchRevenue() {
   } catch (error) {
     console.error('Database Error:', error);
     throw new Error('Failed to fetch revenue data.');
+  }
+}
+
+export async function updateRevenueById(id: number, newTotal: number) {
+  try {
+    // Use UPDATE instead of SELECT
+    const data = await sql<Revenue>`
+      UPDATE revenue
+      SET total = ${newTotal}
+      WHERE id = ${id}
+      RETURNING *;
+    `;
+
+    // Return the updated row(s)
+    return data.rows[0];
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to update revenue data.');
   }
 }
 
